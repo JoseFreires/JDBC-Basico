@@ -1,0 +1,50 @@
+// Deletando Dados do Banco de Dados
+
+package application;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import db.DB;
+import db.DbException;
+
+public class Program {
+
+	public static void main(String[] args) {
+
+		Connection conn = null;
+		Statement st = null;
+		
+		try {
+			
+			conn = DB.getConnection();
+			
+			conn.setAutoCommit(false);
+			
+			st = conn.createStatement();
+			
+			int rows1 = st.executeUpdate("UPDATE seller SET baseSalary = 2020 WHERE Deparments = 1");
+			int rows2 = st.executeUpdate("UPDATE seller SET baseSalary = 3020 WHERE Deparments = 2");
+			
+			System.out.printf("Rows Affected: ", rows2 + rows1);
+			
+			conn.commit();
+			
+			
+		} catch(SQLException e) {
+			try {
+				conn.rollback();
+				throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+			} catch (SQLException e1) {
+				throw new DbException("Error trying rollback! Caused by: " + e1.getMessage());
+			}
+		}finally {
+			DB.closeStatement(st);
+			DB.getConnection();
+		}
+		
+		
+	}
+
+}
